@@ -1,0 +1,49 @@
+
+# запуск в pr3
+docker build . -t php:7.4-apache-xdebug
+docker build . -t php:8.0-apache-xdebug
+
+docker run -p 80:80 -v "$PWD":/var/www  -w="/var/www"   php:8.0-apache-xdebug  composer create-project symfony/website-skeleton symp1
+
+#переименование public в html
+cd symp \
+sudo mv public html
+
+#запуск в symp1
+docker run -d -p 80:80 -v "$PWD":/var/www --name oo  php:7.4-apache-xdebug 
+docker run -d -p 80:80 -v "$PWD":/var/www --name oo  php:8.0-apache-xdebug
+docker exec -it oo /bin/bash
+
+docker rmi -f $(docker images -a -q)
+docker rm $(docker ps -a -q)
+docker rmi $(docker images -f dangling=true -q)
+docker image prune -a
+
+
+
+git add ./html
+git commit -m "com1"
+
+
+git add ./src
+git commit -m "com1"
+
+docker rmi -f $(docker images --filter dangling=true -q) - - очистка образов кеша слоев -т.е. недействительных образов
+docker rmi $(docker images -a -q) - удаление всех образов
+
+
+
+"pathMappings": {
+                "/var/www/html": "${workspaceRoot}"
+            }
+
+
+
+docker run -p 80:80 -v "$PWD":/var/www  -w="/var/www" -ti  php:7.4-apache-xdebug  composer require symfony/apache-pack
+
+
+
+  doctrine_migrations:
+    migrations_paths:
+        'DoctrineMigrations': '%kernel.project_dir%/src/Migrations'  
+    
